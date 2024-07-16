@@ -24,15 +24,7 @@ export const calculateWithSlippageSell = (amount: bigint, basisPoints: bigint) =
     return amount - (amount * basisPoints) / 10000n;
 };
 
-export async function returnTx(
-    connection: Connection,
-    tx: Transaction,
-    payer: PublicKey,
-    signers: Keypair[],
-    priorityFees?: PriorityFee,
-    commitment: Commitment = DEFAULT_COMMITMENT,
-    finality: Finality = DEFAULT_FINALITY
-): Promise<Transaction> {
+export async function returnTx(tx: Transaction, priorityFees?: PriorityFee): Promise<Transaction> {
     let newTx = new Transaction();
 
     if (priorityFees) {
