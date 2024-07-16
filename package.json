@@ -1,8 +1,7 @@
 {
-  "name": "pumpdotfun-sdk",
-  "version": "1.3.2",
+  "name": "@wngasinur/pumpdotfun-sdk",
+  "version": "1.3.3",
   "description": "A simple SDK for interacting with pumpdotfun",
-  
   "module": "./dist/esm/index.js",
   "main": "./dist/cjs/index.js",
   "browser": "./dist/browser/index.js",
@@ -19,7 +18,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/rckprtr/pumpdotfun-sdk.git"
+    "url": "git+https://github.com/wngasinur/pumpdotfun-sdk.git"
   },
   "keywords": [
     "pumpdotfun",
@@ -48,5 +47,12 @@
     "@rollup/plugin-json": "^6.1.0",
     "@solana/spl-token": "0.4.6",
     "@solana/web3.js": "^1.92.1"
+  },
+  "bugs": {
+    "url": "https://github.com/rckprtr/pumpdotfun-sdk/issues"
+  },
+  "homepage": "https://github.com/rckprtr/pumpdotfun-sdk#readme",
+  "directories": {
+    "example": "example"
   }
 }
