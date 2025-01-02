@@ -149,7 +149,6 @@ export class BondingCurveAccount {
         results.push(0n);
         continue;
       }
-      console.log(`reserve`, currentVirtualSolReserves, currentVirtualTokenReserves);
 
       // Calculate the product of current virtual reserves
       let n = currentVirtualSolReserves * currentVirtualTokenReserves;
@@ -173,6 +172,39 @@ export class BondingCurveAccount {
       currentVirtualSolReserves = i; // New SOL reserves after purchase
       currentVirtualTokenReserves = r; // New token reserves after purchase
       currentRealTokenReserves -= buyAmount; // Reduce real token reserves by the amount sold
+    }
+
+    return results;
+  }
+
+  getSellPrices(amounts: bigint[], feeBasisPoints: bigint): bigint[] {
+    if (this.complete) {
+      throw new Error("Curve is complete");
+    }
+
+    const results: bigint[] = [];
+    let currentSolReserves = this.virtualSolReserves; // Start with current reserves
+    let currentTokenReserves = this.virtualTokenReserves;
+
+    for (let amount of amounts) {
+      if (amount <= 0n) {
+        results.push(0n);
+      } else {
+        // Calculate the proportional amount of virtual sol reserves to be received
+        let n = (amount * currentSolReserves) / (currentTokenReserves + amount);
+
+        // Calculate the fee amount in the same units
+        let a = (n * feeBasisPoints) / 10000n;
+
+        // Net amount after fee
+        let netAmount = n - a;
+
+        results.push(netAmount);
+
+        // Update reserves for the next iteration
+        currentSolReserves -= n; // Reduce SOL reserves by the amount sent
+        currentTokenReserves += amount; // Increase token reserves by the amount received
+      }
     }
 
     return results;
