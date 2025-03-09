@@ -37,7 +37,7 @@ export class PumpFunSDK {
   }
 
   async createAndBuy(
-    creator: Keypair,
+    creator: PublicKey,
     mint: Keypair,
     createTokenMetadata: CreateTokenMetadata,
     buyAmountSol: bigint,
