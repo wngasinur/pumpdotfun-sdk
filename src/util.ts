@@ -16,19 +16,37 @@ import { PriorityFee, TransactionResult } from "./types";
 export const DEFAULT_COMMITMENT: Commitment = "finalized";
 export const DEFAULT_FINALITY: Finality = "finalized";
 
-export const calculateWithSlippageBuy = (
-  amount: bigint,
-  basisPoints: bigint
-) => {
+export const calculateWithSlippageBuy = (amount: bigint, basisPoints: bigint) => {
   return amount + (amount * basisPoints) / 10000n;
 };
 
-export const calculateWithSlippageSell = (
-  amount: bigint,
-  basisPoints: bigint
-) => {
+export const calculateWithSlippageSell = (amount: bigint, basisPoints: bigint) => {
   return amount - (amount * basisPoints) / 10000n;
 };
+
+export const calculateWithSlippage = (amount: bigint, basisPoints: bigint) => {
+  return amount - (amount * basisPoints) / 10000n;
+};
+
+export async function returnTx(tx: Transaction, priorityFees?: PriorityFee): Promise<Transaction> {
+  let newTx = new Transaction();
+
+  if (priorityFees) {
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: priorityFees.unitLimit,
+    });
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: priorityFees.unitPrice,
+    });
+    newTx.add(modifyComputeUnits);
+    newTx.add(addPriorityFee);
+  }
+
+  newTx.add(tx);
+
+  return newTx;
+}
 
 export async function sendTx(
   connection: Connection,
@@ -96,8 +114,7 @@ export const buildVersionedTx = async (
   tx: Transaction,
   commitment: Commitment = DEFAULT_COMMITMENT
 ): Promise<VersionedTransaction> => {
-  const blockHash = (await connection.getLatestBlockhash(commitment))
-    .blockhash;
+  const blockHash = (await connection.getLatestBlockhash(commitment)).blockhash;
 
   let messageV0 = new TransactionMessage({
     payerKey: payer,

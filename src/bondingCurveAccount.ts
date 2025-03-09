@@ -1,4 +1,5 @@
 import { struct, bool, u64, Layout } from "@coral-xyz/borsh";
+import { GlobalAccount } from "./globalAccount";
 
 export class BondingCurveAccount {
   public discriminator: bigint;
@@ -62,8 +63,7 @@ export class BondingCurveAccount {
     }
 
     // Calculate the proportional amount of virtual sol reserves to be received
-    let n =
-      (amount * this.virtualSolReserves) / (this.virtualTokenReserves + amount);
+    let n = (amount * this.virtualSolReserves) / (this.virtualTokenReserves + amount);
 
     // Calculate the fee amount in the same units
     let a = (n * feeBasisPoints) / 10000n;
@@ -77,17 +77,11 @@ export class BondingCurveAccount {
       return 0n;
     }
 
-    return (
-      (this.tokenTotalSupply * this.virtualSolReserves) /
-      this.virtualTokenReserves
-    );
+    return (this.tokenTotalSupply * this.virtualSolReserves) / this.virtualTokenReserves;
   }
 
   getFinalMarketCapSOL(feeBasisPoints: bigint): bigint {
-    let totalSellValue = this.getBuyOutPrice(
-      this.realTokenReserves,
-      feeBasisPoints
-    );
+    let totalSellValue = this.getBuyOutPrice(this.realTokenReserves, feeBasisPoints);
     let totalVirtualValue = this.virtualSolReserves + totalSellValue;
     let totalVirtualTokens = this.virtualTokenReserves - this.realTokenReserves;
 
@@ -99,12 +93,8 @@ export class BondingCurveAccount {
   }
 
   getBuyOutPrice(amount: bigint, feeBasisPoints: bigint): bigint {
-    let solTokens =
-      amount < this.realSolReserves ? this.realSolReserves : amount;
-    let totalSellValue =
-      (solTokens * this.virtualSolReserves) /
-        (this.virtualTokenReserves - solTokens) +
-      1n;
+    let solTokens = amount < this.realSolReserves ? this.realSolReserves : amount;
+    let totalSellValue = (solTokens * this.virtualSolReserves) / (this.virtualTokenReserves - solTokens) + 1n;
     let fee = (totalSellValue * feeBasisPoints) / 10000n;
     return totalSellValue + fee;
   }
@@ -130,5 +120,93 @@ export class BondingCurveAccount {
       BigInt(value.tokenTotalSupply),
       value.complete
     );
+  }
+
+  public static fromGlobalAccount(g: GlobalAccount): BondingCurveAccount {
+    return new BondingCurveAccount(
+      1n,
+      g.initialVirtualTokenReserves,
+      g.initialVirtualSolReserves,
+      g.initialRealTokenReserves,
+      g.initialVirtualSolReserves,
+      g.tokenTotalSupply,
+      false
+    );
+  }
+
+  getBuyPrices(amounts: bigint[]): bigint[] {
+    if (this.complete) {
+      throw new Error("Curve is complete");
+    }
+
+    const results: bigint[] = [];
+    let currentVirtualTokenReserves = this.virtualTokenReserves;
+    let currentVirtualSolReserves = this.virtualSolReserves;
+    let currentRealTokenReserves = this.realTokenReserves;
+
+    for (let amount of amounts) {
+      if (amount <= 0n) {
+        results.push(0n);
+        continue;
+      }
+
+      // Calculate the product of current virtual reserves
+      let n = currentVirtualSolReserves * currentVirtualTokenReserves;
+
+      // Calculate the new virtual sol reserves after the purchase
+      let i = currentVirtualSolReserves + amount;
+
+      // Calculate the new virtual token reserves after the purchase
+      let r = n / i + 1n;
+
+      // Calculate the amount of tokens to be purchased
+      let s = currentVirtualTokenReserves - r;
+
+      // Determine the minimum between calculated and available real tokens
+      let buyAmount = s < currentRealTokenReserves ? s : currentRealTokenReserves;
+
+      // Add result to the array
+      results.push(buyAmount);
+
+      // Update reserves for the next iteration
+      currentVirtualSolReserves = i; // New SOL reserves after purchase
+      currentVirtualTokenReserves = r; // New token reserves after purchase
+      currentRealTokenReserves -= buyAmount; // Reduce real token reserves by the amount sold
+    }
+
+    return results;
+  }
+
+  getSellPrices(amounts: bigint[], feeBasisPoints: bigint): bigint[] {
+    if (this.complete) {
+      throw new Error("Curve is complete");
+    }
+
+    const results: bigint[] = [];
+    let currentSolReserves = this.virtualSolReserves; // Start with current reserves
+    let currentTokenReserves = this.virtualTokenReserves;
+
+    for (let amount of amounts) {
+      if (amount <= 0n) {
+        results.push(0n);
+      } else {
+        // Calculate the proportional amount of virtual sol reserves to be received
+        let n = (amount * currentSolReserves) / (currentTokenReserves + amount);
+
+        // Calculate the fee amount in the same units
+        let a = (n * feeBasisPoints) / 10000n;
+
+        // Net amount after fee
+        let netAmount = n - a;
+
+        results.push(netAmount);
+
+        // Update reserves for the next iteration
+        currentSolReserves -= n; // Reduce SOL reserves by the amount sent
+        currentTokenReserves += amount; // Increase token reserves by the amount received
+      }
+    }
+
+    return results;
   }
 }
