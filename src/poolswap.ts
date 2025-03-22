@@ -38,6 +38,7 @@ export class PumpSwapPool {
           },
         },
       ],
+      commitment: "confirmed",
     });
 
     const mappedPools = response.map((pool) => {
@@ -64,6 +65,7 @@ export class PumpSwapPool {
           },
         },
       ],
+      commitment: "confirmed",
     });
 
     const mappedPools = response.map((pool) => {
@@ -116,8 +118,8 @@ export class PumpSwapPool {
     const tokenAddress = pool.poolData.poolBaseTokenAccount;
 
     const [wsolBalance, tokenBalance] = await Promise.all([
-      this.connection.getTokenAccountBalance(wsolAddress),
-      this.connection.getTokenAccountBalance(tokenAddress),
+      this.connection.getTokenAccountBalance(wsolAddress, "confirmed"),
+      this.connection.getTokenAccountBalance(tokenAddress, "confirmed"),
     ]);
 
     const price = wsolBalance.value.uiAmount! / tokenBalance.value.uiAmount!;
