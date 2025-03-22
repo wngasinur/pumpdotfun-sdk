@@ -1,32 +1,15 @@
-import {
-  Commitment,
-  Connection,
-  Finality,
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-  SystemProgram,
-  LAMPORTS_PER_SOL,
-  ComputeBudgetProgram,
-  TransactionMessage,
-  VersionedTransaction,
-} from "@solana/web3.js";
+import { Commitment, Connection, PublicKey, Transaction, TransactionInstruction, SystemProgram } from "@solana/web3.js";
 import { Program, Provider } from "@coral-xyz/anchor";
 import {
   createAssociatedTokenAccountInstruction,
   getAccount,
   getAssociatedTokenAddress,
-  getOrCreateAssociatedTokenAccount,
-  getAssociatedTokenAddressSync,
-  createAssociatedTokenAccountIdempotentInstruction,
   NATIVE_MINT,
   createSyncNativeInstruction,
   createCloseAccountInstruction,
 } from "@solana/spl-token";
 import { PumpSwap, IDL_SWAP } from "./IDL/index";
-import { BN } from "bn.js";
-import { calculateWithSlippageBuy, DEFAULT_COMMITMENT } from "./util";
+import { DEFAULT_COMMITMENT } from "./util";
 import { PumpSwapPool } from "./poolswap";
 
 // Define static public keys
@@ -40,8 +23,6 @@ const feeRecipient = new PublicKey("62qc2CNXwrYqQScmEdiZFFAnJR262PxWEuNQtxfafNgV
 const feeRecipientAta = new PublicKey("94qWNrtmfn42h3ZjUZwWvK1MEo9uVmmrBPd2hpNjYDjb");
 const BUY_DISCRIMINATOR: Uint8Array = new Uint8Array([102, 6, 61, 18, 1, 218, 235, 234]);
 const SELL_DISCRIMINATOR: Uint8Array = new Uint8Array([51, 230, 133, 164, 1, 127, 131, 173]);
-
-export const DEFAULT_DECIMALS = 6;
 
 export class PumpSwapSDK {
   public program: Program<PumpSwap>;
