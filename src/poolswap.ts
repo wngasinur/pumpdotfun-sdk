@@ -1,6 +1,8 @@
-import { Program, Provider } from "@coral-xyz/anchor";
+import { BN, Program, Provider } from "@coral-xyz/anchor";
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { PumpSwap, IDL_SWAP } from "./IDL";
+import { PUMP_AMM_PROGRAM_ID_PUBKEY } from "./sdk/pda";
+import { fee } from "./sdk/util";
 
 const PUMP_AMM_PROGRAM_ID: PublicKey = new PublicKey("pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA");
 const WSOL_TOKEN_ACCOUNT: PublicKey = new PublicKey("So11111111111111111111111111111111111111112");
@@ -14,17 +16,30 @@ interface Pool {
 interface PoolWithPrice extends Pool {
   price: number;
   reserves: {
-    native: number;
-    token: number;
+    native: string;
+    token: string;
   };
+  globalConfig: {
+    admin: PublicKey;
+    lpFeeBasisPoints: BN;
+    protocolFeeBasisPoints: BN;
+    disableFlags: number;
+    protocolFeeRecipients: PublicKey[];
+  };
+}
+
+export function globalConfigPda(programId: PublicKey = PUMP_AMM_PROGRAM_ID_PUBKEY): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync([Buffer.from("global_config")], programId);
 }
 
 export class PumpSwapPool {
   public program: Program<PumpSwap>;
   public connection: Connection;
+  private readonly globalConfig: PublicKey;
   constructor(provider?: Provider) {
     this.program = new Program<PumpSwap>(IDL_SWAP as PumpSwap, provider);
     this.connection = this.program.provider.connection;
+    this.globalConfig = globalConfigPda(this.program.programId)[0];
   }
 
   public async getPoolsWithBaseMint(mintAddress: PublicKey) {
@@ -124,12 +139,14 @@ export class PumpSwapPool {
 
     const price = wsolBalance.value.uiAmount! / tokenBalance.value.uiAmount!;
 
+    const globalConfig = await this.fetchGlobalConfigAccount();
     return {
       ...pool,
       price,
+      globalConfig,
       reserves: {
-        native: wsolBalance.value.uiAmount!,
-        token: tokenBalance.value.uiAmount!,
+        native: wsolBalance.value.amount,
+        token: tokenBalance.value.amount,
       },
     } as PoolWithPrice;
   }
@@ -156,13 +173,20 @@ export class PumpSwapPool {
 
     const results = await Promise.all(pools.map((pool) => this.getPriceAndLiquidity(pool)));
 
-    const sortedByHighestLiquidity = results.sort((a, b) => b.reserves.native - a.reserves.native);
+    const sortedByHighestLiquidity = results.sort((a, b) => Number(b.reserves.native) - Number(a.reserves.native));
 
     return sortedByHighestLiquidity;
   }
 
-  public async getBuyTokenAmount(solAmount: bigint, mint: PublicKey, pool?: PoolWithPrice) {
+  public async getBuyTokenAmount(solAmount: bigint, mint: PublicKey, slippage: number, pool?: PoolWithPrice) {
     let poolDetail = pool;
+
+    if (solAmount == 0n) {
+      return {
+        maxQuote: new BN(0),
+        baseAmountOut: new BN(0),
+      };
+    }
 
     if (!poolDetail) {
       const pool_detail = await this.getPoolsWithPrices(mint);
@@ -171,18 +195,61 @@ export class PumpSwapPool {
       }
       poolDetail = pool_detail[0];
     }
+    const quote = new BN(solAmount.toString());
+    const baseReserve = new BN(poolDetail.reserves.token);
+    const quoteReserve = new BN(poolDetail.reserves.native);
+    const lpFeeBps = poolDetail.globalConfig.lpFeeBasisPoints;
+    const protocolFeeBps = poolDetail.globalConfig.protocolFeeBasisPoints;
 
-    const sol_reserve = BigInt(poolDetail.reserves.native * LAMPORTS_PER_SOL);
-    const token_reserve = BigInt(poolDetail.reserves.token * 10 ** 6);
-    const product = sol_reserve * token_reserve;
-    let new_sol_reserve = sol_reserve + solAmount;
-    let new_token_reserve = product / new_sol_reserve + 1n;
-    let amount_to_be_purchased = token_reserve - new_token_reserve;
-    console.log("Pool address", poolDetail.address.toBase58(), "sol amount", solAmount, "amount to be purchased", amount_to_be_purchased);
-    return amount_to_be_purchased;
+    if (quote.isZero()) {
+      throw new Error("Invalid input: 'quote' cannot be zero.");
+    }
+    if (baseReserve.isZero() || quoteReserve.isZero()) {
+      throw new Error("Invalid input: 'baseReserve' or 'quoteReserve' cannot be zero.");
+    }
+    if (lpFeeBps.isNeg() || protocolFeeBps.isNeg()) {
+      throw new Error("Fee basis points cannot be negative.");
+    }
+
+    // -----------------------------------------------------
+    // 2) Calculate total fee basis points and denominator
+    // -----------------------------------------------------
+    const totalFeeBps = lpFeeBps.add(protocolFeeBps);
+    const denominator = new BN(10_000).add(totalFeeBps);
+
+    // -----------------------------------------------------
+    // 3) Calculate effective quote amount
+    // -----------------------------------------------------
+    const effectiveQuote = quote.mul(new BN(10_000)).div(denominator);
+
+    // -----------------------------------------------------
+    // 4) Calculate the base tokens received using effectiveQuote
+    //    base_amount_out = floor(base_reserve * effectiveQuote / (quote_reserve + effectiveQuote))
+    // -----------------------------------------------------
+    const numerator = baseReserve.mul(effectiveQuote);
+    const denominatorEffective = quoteReserve.add(effectiveQuote);
+
+    if (denominatorEffective.isZero()) {
+      throw new Error("Pool would be depleted; denominator is zero.");
+    }
+
+    const baseAmountOut = numerator.div(denominatorEffective);
+
+    // -----------------------------------------------------
+    // 5) Calculate maxQuote with slippage
+    //    If slippage=1 => factor = (1 + 1/100) = 1.01
+    // -----------------------------------------------------
+    const precision = new BN(1_000_000_000); // For slippage calculations
+    const slippageFactorFloat = (1 + slippage / 10000) * 1_000_000_000;
+    const slippageFactor = new BN(Math.floor(slippageFactorFloat));
+
+    // maxQuote = quote * slippageFactor / 1e9
+    const maxQuote = quote.mul(slippageFactor).div(precision);
+
+    return { maxQuote, baseAmountOut };
   }
 
-  public async getSellTokenAmount(tokenAmount: bigint, mint: PublicKey, pool?: PoolWithPrice) {
+  public async getBuyTokenAmounts(solAmounts: bigint[], mint: PublicKey, slippage: number, pool?: PoolWithPrice) {
     let poolDetail = pool;
 
     if (!poolDetail) {
@@ -193,14 +260,135 @@ export class PumpSwapPool {
       poolDetail = pool_detail[0];
     }
 
-    const sol_reserve = BigInt(poolDetail.reserves.native * LAMPORTS_PER_SOL);
-    const token_reserve = BigInt(poolDetail.reserves.token * 10 ** 6);
-    const product = sol_reserve * token_reserve;
-    let new_token_reserve = token_reserve + tokenAmount;
-    let new_sol_reserve = product / new_token_reserve + 1n;
-    let sol_amount_to_receive = sol_reserve - new_sol_reserve;
-    console.log("Pool address", poolDetail.address.toBase58(), "token amount", tokenAmount, "sol amount to receive", sol_amount_to_receive);
-    return sol_amount_to_receive;
+    let currentBaseReserve = new BN(poolDetail.reserves.token);
+    let currentQuoteReserve = new BN(poolDetail.reserves.native);
+
+    const results: { maxQuote: BN; baseAmountOut: BN }[] = [];
+
+    for (const solAmount of solAmounts) {
+      // Create temporary pool state for this iteration
+      const tempPool = {
+        ...poolDetail,
+        reserves: {
+          token: currentBaseReserve.toString(),
+          native: currentQuoteReserve.toString(),
+        },
+      };
+
+      // Calculate amounts using existing function
+      const result = await this.getBuyTokenAmount(solAmount, mint, slippage, tempPool);
+      results.push(result);
+
+      // Update reserves for next iteration
+      currentBaseReserve = currentBaseReserve.sub(result.baseAmountOut);
+      currentQuoteReserve = currentQuoteReserve.add(new BN(solAmount.toString()));
+    }
+
+    return results;
+  }
+
+  public async getSellTokenAmount(tokenAmount: bigint, mint: PublicKey, slippage: number, pool?: PoolWithPrice) {
+    let poolDetail = pool;
+
+    if (tokenAmount == 0n) {
+      return new BN(0);
+    }
+
+    if (!poolDetail) {
+      const pool_detail = await this.getPoolsWithPrices(mint);
+      if (pool_detail.length == 0) {
+        throw new Error(`Unable to find pool ${mint.toBase58()}`);
+      }
+      poolDetail = pool_detail[0];
+    }
+
+    const base = new BN(tokenAmount.toString());
+    const baseReserve = new BN(poolDetail.reserves.token);
+    const quoteReserve = new BN(poolDetail.reserves.native);
+    const lpFeeBps = poolDetail.globalConfig.lpFeeBasisPoints;
+    const protocolFeeBps = poolDetail.globalConfig.protocolFeeBasisPoints;
+
+    if (base.isZero()) {
+      throw new Error("Invalid input: 'base' (base_amount_in) cannot be zero.");
+    }
+    if (baseReserve.isZero() || quoteReserve.isZero()) {
+      throw new Error("Invalid input: 'baseReserve' or 'quoteReserve' cannot be zero.");
+    }
+    if (lpFeeBps.isNeg() || protocolFeeBps.isNeg()) {
+      throw new Error("Fee basis points cannot be negative.");
+    }
+
+    // -----------------------------------------
+    // 2) Calculate the raw quote output (no fees)
+    //    This matches a typical constant-product formula for selling base to get quote:
+    //      quote_amount_out = floor( (quoteReserve * base) / (baseReserve + base) )
+    // -----------------------------------------
+    const quoteAmountOut = quoteReserve.mul(base).div(baseReserve.add(base)); // floor by BN.div
+
+    // -----------------------------------------
+    // 3) Calculate fees
+    //    LP fee and protocol fee are both taken from 'quoteAmountOut'
+    // -----------------------------------------
+    const lpFee = fee(quoteAmountOut, lpFeeBps);
+    const protocolFee = fee(quoteAmountOut, protocolFeeBps);
+
+    // Subtract fees to get the actual user receive
+    const finalQuote = quoteAmountOut.sub(lpFee).sub(protocolFee);
+    if (finalQuote.isNeg()) {
+      // Theoretically shouldn't happen unless fees exceed quoteAmountOut
+      throw new Error("Fees exceed total output; final quote is negative.");
+    }
+
+    // -----------------------------------------
+    // 4) Calculate minQuote with slippage
+    //    - If slippage=1 => 1%, we allow receiving as low as 99% of finalQuote
+    // -----------------------------------------
+    const precision = new BN(1_000_000_000); // For safe integer math
+    // (1 - slippage/100) => e.g. slippage=1 => factor= 0.99
+    const slippageFactorFloat = (1 - slippage / 10000) * 1_000_000_000;
+    const slippageFactor = new BN(Math.floor(slippageFactorFloat));
+
+    // minQuote = finalQuote * (1 - slippage/100)
+    const minQuote = finalQuote.mul(slippageFactor).div(precision);
+
+    return minQuote;
+  }
+
+  public async getSellTokenAmounts(tokenAmounts: bigint[], mint: PublicKey, slippage: number, pool?: PoolWithPrice) {
+    let poolDetail = pool;
+
+    if (!poolDetail) {
+      const pool_detail = await this.getPoolsWithPrices(mint);
+      if (pool_detail.length == 0) {
+        throw new Error(`Unable to find pool ${mint.toBase58()}`);
+      }
+      poolDetail = pool_detail[0];
+    }
+
+    let currentBaseReserve = new BN(poolDetail.reserves.token);
+    let currentQuoteReserve = new BN(poolDetail.reserves.native);
+
+    const results: BN[] = [];
+
+    for (const tokenAmount of tokenAmounts) {
+      // Create temporary pool state for this iteration
+      const tempPool = {
+        ...poolDetail,
+        reserves: {
+          token: currentBaseReserve.toString(),
+          native: currentQuoteReserve.toString(),
+        },
+      };
+
+      const minQuote = await this.getSellTokenAmount(tokenAmount, mint, slippage, tempPool);
+      results.push(minQuote);
+
+      // Update reserves for next iteration
+      currentBaseReserve = currentBaseReserve.add(new BN(tokenAmount.toString()));
+      currentQuoteReserve = currentQuoteReserve.sub(minQuote);
+    }
+
+    return results;
   }
 
   public async getPumpSwapPool(mint: PublicKey) {
@@ -215,5 +403,9 @@ export class PumpSwapPool {
   public async getPrice(mint: PublicKey) {
     const pools = await this.getPoolsWithPrices(mint);
     return pools[0].price;
+  }
+
+  public fetchGlobalConfigAccount() {
+    return this.program.account.globalConfig.fetch(this.globalConfig);
   }
 }

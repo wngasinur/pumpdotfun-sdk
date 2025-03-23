@@ -4,7 +4,7 @@
  * Note that this is only a type helper and is not the actual IDL. The original
  * IDL can be found at `target/idl/pump_amm.json`.
  */
-export type PumpSwap = {
+export type PumpAmm = {
   address: "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA";
   metadata: {
     name: "pumpAmm";
@@ -73,7 +73,7 @@ export type PumpSwap = {
               {
                 kind: "account";
                 path: "quoteMint";
-              }
+              },
             ];
             program: {
               kind: "const";
@@ -109,7 +109,7 @@ export type PumpSwap = {
                 219,
                 233,
                 248,
-                89
+                89,
               ];
             };
           };
@@ -134,14 +134,32 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
-              }
+                value: [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121,
+                ];
+              },
             ];
           };
         },
         {
           name: "program";
-        }
+        },
       ];
       args: [
         {
@@ -151,7 +169,7 @@ export type PumpSwap = {
         {
           name: "maxQuoteAmountIn";
           type: "u64";
-        }
+        },
       ];
     },
     {
@@ -171,8 +189,22 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [103, 108, 111, 98, 97, 108, 95, 99, 111, 110, 102, 105, 103];
-              }
+                value: [
+                  103,
+                  108,
+                  111,
+                  98,
+                  97,
+                  108,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                ];
+              },
             ];
           };
         },
@@ -186,14 +218,32 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
-              }
+                value: [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121,
+                ];
+              },
             ];
           };
         },
         {
           name: "program";
-        }
+        },
       ];
       args: [
         {
@@ -209,7 +259,7 @@ export type PumpSwap = {
           type: {
             array: ["pubkey", 8];
           };
-        }
+        },
       ];
     },
     {
@@ -240,7 +290,7 @@ export type PumpSwap = {
               {
                 kind: "account";
                 path: "quoteMint";
-              }
+              },
             ];
           };
         },
@@ -265,12 +315,25 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [112, 111, 111, 108, 95, 108, 112, 95, 109, 105, 110, 116];
+                value: [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  108,
+                  112,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116,
+                ];
               },
               {
                 kind: "account";
                 path: "pool";
-              }
+              },
             ];
           };
         },
@@ -298,7 +361,7 @@ export type PumpSwap = {
               {
                 kind: "account";
                 path: "lpMint";
-              }
+              },
             ];
             program: {
               kind: "const";
@@ -334,7 +397,7 @@ export type PumpSwap = {
                 219,
                 233,
                 248,
-                89
+                89,
               ];
             };
           };
@@ -355,7 +418,7 @@ export type PumpSwap = {
               {
                 kind: "account";
                 path: "baseMint";
-              }
+              },
             ];
             program: {
               kind: "const";
@@ -391,7 +454,7 @@ export type PumpSwap = {
                 219,
                 233,
                 248,
-                89
+                89,
               ];
             };
           };
@@ -412,7 +475,7 @@ export type PumpSwap = {
               {
                 kind: "account";
                 path: "quoteMint";
-              }
+              },
             ];
             program: {
               kind: "const";
@@ -448,7 +511,7 @@ export type PumpSwap = {
                 219,
                 233,
                 248,
-                89
+                89,
               ];
             };
           };
@@ -477,14 +540,32 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
-              }
+                value: [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121,
+                ];
+              },
             ];
           };
         },
         {
           name: "program";
-        }
+        },
       ];
       args: [
         {
@@ -498,7 +579,7 @@ export type PumpSwap = {
         {
           name: "quoteAmountIn";
           type: "u64";
-        }
+        },
       ];
     },
     {
@@ -565,14 +646,32 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
-              }
+                value: [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121,
+                ];
+              },
             ];
           };
         },
         {
           name: "program";
-        }
+        },
       ];
       args: [
         {
@@ -586,7 +685,7 @@ export type PumpSwap = {
         {
           name: "maxQuoteAmountIn";
           type: "u64";
-        }
+        },
       ];
     },
     {
@@ -608,14 +707,32 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
-              }
+                value: [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121,
+                ];
+              },
             ];
           };
         },
         {
           name: "program";
-        }
+        },
       ];
       args: [
         {
@@ -637,7 +754,7 @@ export type PumpSwap = {
         {
           name: "disableSell";
           type: "bool";
-        }
+        },
       ];
     },
     {
@@ -662,14 +779,32 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
-              }
+                value: [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121,
+                ];
+              },
             ];
           };
         },
         {
           name: "program";
-        }
+        },
       ];
       args: [];
     },
@@ -733,7 +868,7 @@ export type PumpSwap = {
               {
                 kind: "account";
                 path: "quoteMint";
-              }
+              },
             ];
             program: {
               kind: "const";
@@ -769,7 +904,7 @@ export type PumpSwap = {
                 219,
                 233,
                 248,
-                89
+                89,
               ];
             };
           };
@@ -794,14 +929,32 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
-              }
+                value: [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121,
+                ];
+              },
             ];
           };
         },
         {
           name: "program";
-        }
+        },
       ];
       args: [
         {
@@ -811,7 +964,7 @@ export type PumpSwap = {
         {
           name: "minQuoteAmountOut";
           type: "u64";
-        }
+        },
       ];
     },
     {
@@ -836,14 +989,32 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
-              }
+                value: [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121,
+                ];
+              },
             ];
           };
         },
         {
           name: "program";
-        }
+        },
       ];
       args: [];
     },
@@ -866,14 +1037,32 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
-              }
+                value: [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121,
+                ];
+              },
             ];
           };
         },
         {
           name: "program";
-        }
+        },
       ];
       args: [
         {
@@ -889,7 +1078,7 @@ export type PumpSwap = {
           type: {
             array: ["pubkey", 8];
           };
-        }
+        },
       ];
     },
     {
@@ -956,14 +1145,32 @@ export type PumpSwap = {
             seeds: [
               {
                 kind: "const";
-                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
-              }
+                value: [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121,
+                ];
+              },
             ];
           };
         },
         {
           name: "program";
-        }
+        },
       ];
       args: [
         {
@@ -977,9 +1184,9 @@ export type PumpSwap = {
         {
           name: "minQuoteAmountOut";
           type: "u64";
-        }
+        },
       ];
-    }
+    },
   ];
   accounts: [
     {
@@ -989,7 +1196,7 @@ export type PumpSwap = {
     {
       name: "pool";
       discriminator: [241, 154, 109, 4, 17, 177, 109, 188];
-    }
+    },
   ];
   events: [
     {
@@ -1031,7 +1238,7 @@ export type PumpSwap = {
     {
       name: "withdrawEvent";
       discriminator: [22, 9, 133, 26, 160, 44, 71, 192];
-    }
+    },
   ];
   errors: [
     {
@@ -1145,7 +1352,7 @@ export type PumpSwap = {
     {
       code: 6027;
       name: "accountTypeNotSupported";
-    }
+    },
   ];
   types: [
     {
@@ -1232,7 +1439,7 @@ export type PumpSwap = {
           {
             name: "protocolFeeRecipientTokenAccount";
             type: "pubkey";
-          }
+          },
         ];
       };
     },
@@ -1262,7 +1469,7 @@ export type PumpSwap = {
             type: {
               array: ["pubkey", 8];
             };
-          }
+          },
         ];
       };
     },
@@ -1346,7 +1553,7 @@ export type PumpSwap = {
           {
             name: "userQuoteTokenAccount";
             type: "pubkey";
-          }
+          },
         ];
       };
     },
@@ -1418,7 +1625,7 @@ export type PumpSwap = {
           {
             name: "userPoolTokenAccount";
             type: "pubkey";
-          }
+          },
         ];
       };
     },
@@ -1454,7 +1661,7 @@ export type PumpSwap = {
           {
             name: "disableSell";
             type: "bool";
-          }
+          },
         ];
       };
     },
@@ -1482,7 +1689,7 @@ export type PumpSwap = {
           {
             name: "newSize";
             type: "u64";
-          }
+          },
         ];
       };
     },
@@ -1514,7 +1721,7 @@ export type PumpSwap = {
               "bit 1 - Disable deposit",
               "bit 2 - Disable withdraw",
               "bit 3 - Disable buy",
-              "bit 4 - Disable sell"
+              "bit 4 - Disable sell",
             ];
             type: "u8";
           },
@@ -1524,7 +1731,7 @@ export type PumpSwap = {
             type: {
               array: ["pubkey", 8];
             };
-          }
+          },
         ];
       };
     },
@@ -1569,7 +1776,7 @@ export type PumpSwap = {
             name: "lpSupply";
             docs: ["True circulating supply without burns and lock-ups"];
             type: "u64";
-          }
+          },
         ];
       };
     },
@@ -1657,7 +1864,7 @@ export type PumpSwap = {
           {
             name: "protocolFeeRecipientTokenAccount";
             type: "pubkey";
-          }
+          },
         ];
       };
     },
@@ -1677,7 +1884,7 @@ export type PumpSwap = {
           {
             name: "newAdmin";
             type: "pubkey";
-          }
+          },
         ];
       };
     },
@@ -1707,7 +1914,7 @@ export type PumpSwap = {
             type: {
               array: ["pubkey", 8];
             };
-          }
+          },
         ];
       };
     },
@@ -1779,9 +1986,9 @@ export type PumpSwap = {
           {
             name: "userPoolTokenAccount";
             type: "pubkey";
-          }
+          },
         ];
       };
-    }
+    },
   ];
 };
