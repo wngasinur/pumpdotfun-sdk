@@ -134,6 +134,21 @@ export class PumpSwapPool {
     } as PoolWithPrice;
   }
 
+  public async getPoolDataFromPoolId(poolId: PublicKey) {
+    const accountInfo = await this.connection.getAccountInfo(poolId, "confirmed");
+
+    if (!accountInfo?.data) return;
+    const data = Buffer.from(accountInfo?.data!);
+    const poolData = this.program.coder.accounts.decode("pool", data);
+    const pool = {
+      address: poolId,
+      is_native_base: false,
+      poolData,
+    } as Pool;
+
+    return pool;
+  }
+
   public async getPoolsWithPrices(mintAddress: PublicKey) {
     const [poolsWithBaseMint, poolsWithQuoteMint] = await Promise.all([this.getPoolsWithBaseMint(mintAddress), this.getPoolsWithQuoteMint(mintAddress)]);
     //const poolsWithBaseMinQuoteWSOL = await getPoolsWithBaseMintQuoteWSOL(mintAddress)
