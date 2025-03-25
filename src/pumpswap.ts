@@ -107,7 +107,7 @@ export class PumpSwapSDK {
     const userBaseTokenAccount = await getAssociatedTokenAddress(mint, user);
     const userQuoteTokenAccount = await getAssociatedTokenAddress(WSOL_TOKEN_ACCOUNT, user);
 
-    const { index, creator, baseMint, quoteMint } = await this.program.account.pool.fetch(poolId);
+    const { index, creator, baseMint, quoteMint } = await this.program.account.pool.fetch(poolId, "confirmed");
     const [pool] = this.poolKey(index, creator, baseMint, quoteMint);
     const globalConfig = globalConfigPda(this.program.programId)[0];
     const swapAccounts = await this.swapAccounts(pool, mint, WSOL_TOKEN_ACCOUNT, user, globalConfig, feeRecipient, userBaseTokenAccount, userQuoteTokenAccount);
