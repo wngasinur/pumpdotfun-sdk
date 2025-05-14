@@ -45,7 +45,6 @@ export class PumpSwapPool {
   public async getPoolsWithBaseMint(mintAddress: PublicKey) {
     const response = await this.connection.getProgramAccounts(PUMP_AMM_PROGRAM_ID, {
       filters: [
-        { dataSize: 211 },
         {
           memcmp: {
             offset: 43,
@@ -72,7 +71,6 @@ export class PumpSwapPool {
   public async getPoolsWithQuoteMint(mintAddress: PublicKey) {
     const response = await this.connection.getProgramAccounts(PUMP_AMM_PROGRAM_ID, {
       filters: [
-        { dataSize: 211 },
         {
           memcmp: {
             offset: 75,
