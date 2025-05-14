@@ -24,6 +24,7 @@ const MPL_TOKEN_METADATA_PROGRAM_ID = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x
 export const GLOBAL_ACCOUNT_SEED = "global";
 export const MINT_AUTHORITY_SEED = "mint-authority";
 export const BONDING_CURVE_SEED = "bonding-curve";
+export const CREATOR_VAULT_SEED = "creator-vault";
 export const METADATA_SEED = "metadata";
 
 export const DEFAULT_DECIMALS = 6;
@@ -57,7 +58,7 @@ export class PumpFunSDK {
       const buyAmount = globalAccount.getInitialBuyPrice(buyAmountSol);
       const buyAmountWithSlippage = calculateWithSlippageBuy(buyAmountSol, slippageBasisPoints);
 
-      const buyTx = await this.getBuyInstructions(creator, mint.publicKey, globalAccount.feeRecipient, buyAmount, buyAmountWithSlippage);
+      const buyTx = await this.getBuyInstructions(creator, mint.publicKey, globalAccount.feeRecipient, buyAmount, buyAmountWithSlippage, creator, commitment);
 
       newTx.add(buyTx);
     }
@@ -111,6 +112,7 @@ export class PumpFunSDK {
       .create(name, symbol, uri, creator)
       .accounts({
         mint: mint.publicKey,
+        // @ts-ignore
         associatedBondingCurve: associatedBondingCurve,
         metadata: metadataPDA,
         user: creator,
@@ -124,9 +126,13 @@ export class PumpFunSDK {
     mint: PublicKey,
     buyAmountSol: bigint,
     slippageBasisPoints: bigint = 500n,
-    commitment: Commitment = DEFAULT_COMMITMENT
+    commitment: Commitment = DEFAULT_COMMITMENT,
+    bondingCurveAccount?: BondingCurveAccount | null
   ) {
-    let bondingCurveAccount = await this.getBondingCurveAccount(mint, commitment);
+    if (!bondingCurveAccount) {
+      bondingCurveAccount = await this.getBondingCurveAccount(mint, commitment);
+    }
+
     if (!bondingCurveAccount) {
       throw new Error(`Bonding curve account not found: ${mint.toBase58()}`);
     }
@@ -136,7 +142,7 @@ export class PumpFunSDK {
 
     let globalAccount = await this.getGlobalAccount(commitment);
 
-    return await this.getBuyInstructions(buyer, mint, globalAccount.feeRecipient, buyAmount, buyAmountWithSlippage);
+    return await this.getBuyInstructions(buyer, mint, globalAccount.feeRecipient, buyAmount, buyAmountWithSlippage, bondingCurveAccount.creator, commitment);
   }
 
   //buy
@@ -146,9 +152,10 @@ export class PumpFunSDK {
     feeRecipient: PublicKey,
     amount: bigint,
     solAmount: bigint,
+    bondingCurveCreator: PublicKey,
     commitment: Commitment = DEFAULT_COMMITMENT
   ) {
-    const associatedBondingCurve = await getAssociatedTokenAddress(mint, this.getBondingCurvePDA(mint), true);
+    // const associatedBondingCurve = await getAssociatedTokenAddress(mint, this.getBondingCurvePDA(mint), true);
 
     const associatedUser = await getAssociatedTokenAddress(mint, buyer, false);
 
@@ -163,12 +170,12 @@ export class PumpFunSDK {
     transaction.add(
       await this.program.methods
         .buy(new BN(amount.toString()), new BN(solAmount.toString()))
-        .accounts({
+        .accountsPartial({
           feeRecipient: feeRecipient,
           mint: mint,
-          associatedBondingCurve: associatedBondingCurve,
           associatedUser: associatedUser,
           user: buyer,
+          creatorVault: this.getCreatorVaultPDA(bondingCurveCreator),
         })
         .transaction()
     );
@@ -202,6 +209,7 @@ export class PumpFunSDK {
         .accounts({
           feeRecipient: feeRecipient,
           mint: mint,
+          // @ts-ignore
           associatedBondingCurve: associatedBondingCurve,
           associatedUser: associatedUser,
           user: buyer,
@@ -244,10 +252,9 @@ export class PumpFunSDK {
     transaction.add(
       await this.program.methods
         .sell(new BN(amount.toString()), new BN(minSolOutput.toString()))
-        .accounts({
+        .accountsPartial({
           feeRecipient: feeRecipient,
           mint: mint,
-          associatedBondingCurve: associatedBondingCurve,
           associatedUser: associatedUser,
           user: seller,
         })
@@ -275,6 +282,10 @@ export class PumpFunSDK {
 
   getBondingCurvePDA(mint: PublicKey) {
     return PublicKey.findProgramAddressSync([Buffer.from(BONDING_CURVE_SEED), mint.toBuffer()], this.program.programId)[0];
+  }
+
+  getCreatorVaultPDA(creator: PublicKey) {
+    return PublicKey.findProgramAddressSync([Buffer.from(CREATOR_VAULT_SEED), creator.toBuffer()], this.program.programId)[0];
   }
 
   async createTokenMetadata(create: CreateTokenMetadata) {
