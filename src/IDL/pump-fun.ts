@@ -14,6 +14,266 @@ export type PumpFun = {
   };
   instructions: [
     {
+      name: "adminSetCreator";
+      docs: ["Allows Global::admin_set_creator_authority to override the bonding curve creator"];
+      discriminator: [69, 25, 171, 142, 57, 239, 13, 4];
+      accounts: [
+        {
+          name: "adminSetCreatorAuthority";
+          signer: true;
+          relations: ["global"];
+        },
+        {
+          name: "global";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108];
+              }
+            ];
+          };
+        },
+        {
+          name: "mint";
+        },
+        {
+          name: "bondingCurve";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [98, 111, 110, 100, 105, 110, 103, 45, 99, 117, 114, 118, 101];
+              },
+              {
+                kind: "account";
+                path: "mint";
+              }
+            ];
+          };
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [
+        {
+          name: "creator";
+          type: "pubkey";
+        }
+      ];
+    },
+    {
+      name: "adminSetIdlAuthority";
+      discriminator: [8, 217, 96, 231, 144, 104, 192, 5];
+      accounts: [
+        {
+          name: "authority";
+          signer: true;
+          relations: ["global"];
+        },
+        {
+          name: "global";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108];
+              }
+            ];
+          };
+        },
+        {
+          name: "idlAccount";
+          writable: true;
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        },
+        {
+          name: "programSigner";
+          pda: {
+            seeds: [];
+          };
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [
+        {
+          name: "idlAuthority";
+          type: "pubkey";
+        }
+      ];
+    },
+    {
+      name: "adminUpdateTokenIncentives";
+      discriminator: [209, 11, 115, 87, 213, 23, 124, 204];
+      accounts: [
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
+          relations: ["global"];
+        },
+        {
+          name: "global";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108];
+              }
+            ];
+          };
+        },
+        {
+          name: "globalVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              }
+            ];
+          };
+        },
+        {
+          name: "mint";
+        },
+        {
+          name: "globalIncentiveTokenAccount";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "account";
+                path: "globalVolumeAccumulator";
+              },
+              {
+                kind: "account";
+                path: "tokenProgram";
+              },
+              {
+                kind: "account";
+                path: "mint";
+              }
+            ];
+            program: {
+              kind: "const";
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ];
+            };
+          };
+        },
+        {
+          name: "associatedTokenProgram";
+          address: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        },
+        {
+          name: "tokenProgram";
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [
+        {
+          name: "startTime";
+          type: "i64";
+        },
+        {
+          name: "endTime";
+          type: "i64";
+        },
+        {
+          name: "secondsInADay";
+          type: "i64";
+        },
+        {
+          name: "dayNumber";
+          type: "u64";
+        },
+        {
+          name: "pumpTokenSupplyPerDay";
+          type: "u64";
+        }
+      ];
+    },
+    {
       name: "buy";
       docs: ["Buys tokens from a bonding curve."];
       discriminator: [102, 6, 61, 18, 1, 218, 235, 234];
@@ -189,6 +449,34 @@ export type PumpFun = {
         },
         {
           name: "program";
+        },
+        {
+          name: "globalVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              }
+            ];
+          };
+        },
+        {
+          name: "userVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [117, 115, 101, 114, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              },
+              {
+                kind: "account";
+                path: "user";
+              }
+            ];
+          };
         }
       ];
       args: [
@@ -203,6 +491,233 @@ export type PumpFun = {
       ];
     },
     {
+      name: "claimTokenIncentives";
+      discriminator: [16, 4, 71, 28, 204, 1, 40, 27];
+      accounts: [
+        {
+          name: "user";
+        },
+        {
+          name: "userAta";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "account";
+                path: "user";
+              },
+              {
+                kind: "account";
+                path: "tokenProgram";
+              },
+              {
+                kind: "account";
+                path: "mint";
+              }
+            ];
+            program: {
+              kind: "const";
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ];
+            };
+          };
+        },
+        {
+          name: "globalVolumeAccumulator";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              }
+            ];
+          };
+        },
+        {
+          name: "globalIncentiveTokenAccount";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "account";
+                path: "globalVolumeAccumulator";
+              },
+              {
+                kind: "account";
+                path: "tokenProgram";
+              },
+              {
+                kind: "account";
+                path: "mint";
+              }
+            ];
+            program: {
+              kind: "const";
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ];
+            };
+          };
+        },
+        {
+          name: "userVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [117, 115, 101, 114, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              },
+              {
+                kind: "account";
+                path: "user";
+              }
+            ];
+          };
+        },
+        {
+          name: "mint";
+          relations: ["globalVolumeAccumulator"];
+        },
+        {
+          name: "tokenProgram";
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        },
+        {
+          name: "associatedTokenProgram";
+          address: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        },
+        {
+          name: "payer";
+          writable: true;
+          signer: true;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "closeUserVolumeAccumulator";
+      discriminator: [249, 69, 164, 218, 150, 103, 84, 138];
+      accounts: [
+        {
+          name: "user";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "userVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [117, 115, 101, 114, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              },
+              {
+                kind: "account";
+                path: "user";
+              }
+            ];
+          };
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [];
+    },
+    {
       name: "collectCreatorFee";
       docs: ["Collects creator_fee from creator_vault to the coin creator account"];
       discriminator: [20, 22, 86, 123, 198, 28, 219, 132];
@@ -210,7 +725,6 @@ export type PumpFun = {
         {
           name: "creator";
           writable: true;
-          signer: true;
         },
         {
           name: "creatorVault";
@@ -515,6 +1029,55 @@ export type PumpFun = {
         {
           name: "user";
           signer: true;
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "initUserVolumeAccumulator";
+      discriminator: [94, 6, 202, 115, 255, 96, 232, 183];
+      accounts: [
+        {
+          name: "payer";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "user";
+        },
+        {
+          name: "userVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [117, 115, 101, 114, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              },
+              {
+                kind: "account";
+                path: "user";
+              }
+            ];
+          };
         },
         {
           name: "systemProgram";
@@ -1507,8 +2070,63 @@ export type PumpFun = {
         {
           name: "setCreatorAuthority";
           type: "pubkey";
+        },
+        {
+          name: "adminSetCreatorAuthority";
+          type: "pubkey";
         }
       ];
+    },
+    {
+      name: "syncUserVolumeAccumulator";
+      discriminator: [86, 31, 192, 87, 163, 87, 79, 238];
+      accounts: [
+        {
+          name: "user";
+        },
+        {
+          name: "globalVolumeAccumulator";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              }
+            ];
+          };
+        },
+        {
+          name: "userVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [117, 115, 101, 114, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              },
+              {
+                kind: "account";
+                path: "user";
+              }
+            ];
+          };
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [];
     },
     {
       name: "updateGlobalAuthority";
@@ -1560,9 +2178,37 @@ export type PumpFun = {
     {
       name: "global";
       discriminator: [167, 232, 232, 177, 200, 108, 114, 127];
+    },
+    {
+      name: "globalVolumeAccumulator";
+      discriminator: [202, 42, 246, 43, 142, 190, 30, 255];
+    },
+    {
+      name: "userVolumeAccumulator";
+      discriminator: [86, 255, 112, 14, 102, 53, 154, 250];
     }
   ];
   events: [
+    {
+      name: "adminSetCreatorEvent";
+      discriminator: [64, 69, 192, 104, 29, 30, 25, 107];
+    },
+    {
+      name: "adminSetIdlAuthorityEvent";
+      discriminator: [245, 59, 70, 34, 75, 185, 109, 92];
+    },
+    {
+      name: "adminUpdateTokenIncentivesEvent";
+      discriminator: [147, 250, 108, 120, 247, 29, 67, 222];
+    },
+    {
+      name: "claimTokenIncentivesEvent";
+      discriminator: [79, 172, 246, 49, 205, 91, 206, 232];
+    },
+    {
+      name: "closeUserVolumeAccumulatorEvent";
+      discriminator: [146, 159, 189, 172, 146, 88, 56, 244];
+    },
     {
       name: "collectCreatorFeeEvent";
       discriminator: [122, 2, 127, 1, 14, 191, 12, 175];
@@ -1584,6 +2230,10 @@ export type PumpFun = {
       discriminator: [97, 97, 215, 144, 93, 146, 22, 124];
     },
     {
+      name: "initUserVolumeAccumulatorEvent";
+      discriminator: [134, 36, 13, 72, 232, 101, 130, 216];
+    },
+    {
       name: "setCreatorEvent";
       discriminator: [237, 52, 123, 37, 245, 251, 72, 210];
     },
@@ -1594,6 +2244,10 @@ export type PumpFun = {
     {
       name: "setParamsEvent";
       discriminator: [223, 195, 159, 246, 62, 48, 143, 131];
+    },
+    {
+      name: "syncUserVolumeAccumulatorEvent";
+      discriminator: [197, 122, 167, 124, 116, 81, 91, 255];
     },
     {
       name: "tradeEvent";
@@ -1759,9 +2413,125 @@ export type PumpFun = {
       code: 6030;
       name: "creatorShouldNotBeZero";
       msg: "Creator should not be zero";
+    },
+    {
+      code: 6031;
+      name: "startTimeInThePast";
+    },
+    {
+      code: 6032;
+      name: "endTimeInThePast";
+    },
+    {
+      code: 6033;
+      name: "endTimeBeforeStartTime";
+    },
+    {
+      code: 6034;
+      name: "timeRangeTooLarge";
+    },
+    {
+      code: 6035;
+      name: "endTimeBeforeCurrentDay";
+    },
+    {
+      code: 6036;
+      name: "supplyUpdateForFinishedRange";
+    },
+    {
+      code: 6037;
+      name: "dayIndexAfterEndIndex";
+    },
+    {
+      code: 6038;
+      name: "dayInActiveRange";
+    },
+    {
+      code: 6039;
+      name: "invalidIncentiveMint";
     }
   ];
   types: [
+    {
+      name: "adminSetCreatorEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "timestamp";
+            type: "i64";
+          },
+          {
+            name: "adminSetCreatorAuthority";
+            type: "pubkey";
+          },
+          {
+            name: "mint";
+            type: "pubkey";
+          },
+          {
+            name: "bondingCurve";
+            type: "pubkey";
+          },
+          {
+            name: "oldCreator";
+            type: "pubkey";
+          },
+          {
+            name: "newCreator";
+            type: "pubkey";
+          }
+        ];
+      };
+    },
+    {
+      name: "adminSetIdlAuthorityEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "idlAuthority";
+            type: "pubkey";
+          }
+        ];
+      };
+    },
+    {
+      name: "adminUpdateTokenIncentivesEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "startTime";
+            type: "i64";
+          },
+          {
+            name: "endTime";
+            type: "i64";
+          },
+          {
+            name: "dayNumber";
+            type: "u64";
+          },
+          {
+            name: "tokenSupplyPerDay";
+            type: "u64";
+          },
+          {
+            name: "mint";
+            type: "pubkey";
+          },
+          {
+            name: "secondsInADay";
+            type: "i64";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
+          }
+        ];
+      };
+    },
     {
       name: "bondingCurve";
       type: {
@@ -1794,6 +2564,46 @@ export type PumpFun = {
           {
             name: "creator";
             type: "pubkey";
+          }
+        ];
+      };
+    },
+    {
+      name: "claimTokenIncentivesEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "user";
+            type: "pubkey";
+          },
+          {
+            name: "mint";
+            type: "pubkey";
+          },
+          {
+            name: "amount";
+            type: "u64";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
+          }
+        ];
+      };
+    },
+    {
+      name: "closeUserVolumeAccumulatorEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "user";
+            type: "pubkey";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
           }
         ];
       };
@@ -2030,6 +2840,66 @@ export type PumpFun = {
           {
             name: "setCreatorAuthority";
             type: "pubkey";
+          },
+          {
+            name: "adminSetCreatorAuthority";
+            type: "pubkey";
+          }
+        ];
+      };
+    },
+    {
+      name: "globalVolumeAccumulator";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "startTime";
+            type: "i64";
+          },
+          {
+            name: "endTime";
+            type: "i64";
+          },
+          {
+            name: "secondsInADay";
+            type: "i64";
+          },
+          {
+            name: "mint";
+            type: "pubkey";
+          },
+          {
+            name: "totalTokenSupply";
+            type: {
+              array: ["u64", 30];
+            };
+          },
+          {
+            name: "solVolumes";
+            type: {
+              array: ["u64", 30];
+            };
+          }
+        ];
+      };
+    },
+    {
+      name: "initUserVolumeAccumulatorEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "payer";
+            type: "pubkey";
+          },
+          {
+            name: "user";
+            type: "pubkey";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
           }
         ];
       };
@@ -2144,6 +3014,34 @@ export type PumpFun = {
           {
             name: "setCreatorAuthority";
             type: "pubkey";
+          },
+          {
+            name: "adminSetCreatorAuthority";
+            type: "pubkey";
+          }
+        ];
+      };
+    },
+    {
+      name: "syncUserVolumeAccumulatorEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "user";
+            type: "pubkey";
+          },
+          {
+            name: "totalClaimedTokensBefore";
+            type: "u64";
+          },
+          {
+            name: "totalClaimedTokensAfter";
+            type: "u64";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
           }
         ];
       };
@@ -2240,6 +3138,42 @@ export type PumpFun = {
           {
             name: "timestamp";
             type: "i64";
+          }
+        ];
+      };
+    },
+    {
+      name: "userVolumeAccumulator";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "user";
+            type: "pubkey";
+          },
+          {
+            name: "needsClaim";
+            type: "bool";
+          },
+          {
+            name: "totalUnclaimedTokens";
+            type: "u64";
+          },
+          {
+            name: "totalClaimedTokens";
+            type: "u64";
+          },
+          {
+            name: "currentSolVolume";
+            type: "u64";
+          },
+          {
+            name: "lastUpdateTimestamp";
+            type: "i64";
+          },
+          {
+            name: "hasTotalClaimedTokens";
+            type: "bool";
           }
         ];
       };

@@ -26,6 +26,8 @@ export const MINT_AUTHORITY_SEED = "mint-authority";
 export const BONDING_CURVE_SEED = "bonding-curve";
 export const CREATOR_VAULT_SEED = "creator-vault";
 export const METADATA_SEED = "metadata";
+export const GLOBAL_VOLUME_SEED = "global_volume_accumulator";
+export const USER_VOLUME_SEED = "user_volume_accumulator";
 
 export const DEFAULT_DECIMALS = 6;
 
@@ -176,6 +178,8 @@ export class PumpFunSDK {
           associatedUser: associatedUser,
           user: buyer,
           creatorVault: this.getCreatorVaultPDA(bondingCurveCreator),
+          globalVolumeAccumulator: this.getGlobalVolumeAccumulatorPda(),
+          userVolumeAccumulator: this.getUserVolumeAccumulatorPda(buyer),
         })
         .transaction()
     );
@@ -286,6 +290,14 @@ export class PumpFunSDK {
 
   getCreatorVaultPDA(creator: PublicKey) {
     return PublicKey.findProgramAddressSync([Buffer.from(CREATOR_VAULT_SEED), creator.toBuffer()], this.program.programId)[0];
+  }
+
+  getGlobalVolumeAccumulatorPda(): PublicKey {
+    return PublicKey.findProgramAddressSync([Buffer.from(GLOBAL_VOLUME_SEED)], this.program.programId)[0];
+  }
+
+  getUserVolumeAccumulatorPda(user: PublicKey): PublicKey {
+    return PublicKey.findProgramAddressSync([Buffer.from(USER_VOLUME_SEED), user.toBuffer()], this.program.programId)[0];
   }
 
   async createTokenMetadata(create: CreateTokenMetadata) {
