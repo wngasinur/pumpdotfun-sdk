@@ -14,6 +14,187 @@ export type PumpSwap = {
   };
   instructions: [
     {
+      name: "adminSetCoinCreator";
+      docs: ["Overrides the coin creator for a canonical pump pool"];
+      discriminator: [242, 40, 117, 145, 73, 96, 105, 104];
+      accounts: [
+        {
+          name: "adminSetCoinCreatorAuthority";
+          signer: true;
+          relations: ["globalConfig"];
+        },
+        {
+          name: "globalConfig";
+        },
+        {
+          name: "pool";
+          writable: true;
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [
+        {
+          name: "coinCreator";
+          type: "pubkey";
+        }
+      ];
+    },
+    {
+      name: "adminUpdateTokenIncentives";
+      discriminator: [209, 11, 115, 87, 213, 23, 124, 204];
+      accounts: [
+        {
+          name: "admin";
+          writable: true;
+          signer: true;
+          relations: ["globalConfig"];
+        },
+        {
+          name: "globalConfig";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108, 95, 99, 111, 110, 102, 105, 103];
+              }
+            ];
+          };
+        },
+        {
+          name: "globalVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              }
+            ];
+          };
+        },
+        {
+          name: "mint";
+        },
+        {
+          name: "globalIncentiveTokenAccount";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "account";
+                path: "globalVolumeAccumulator";
+              },
+              {
+                kind: "account";
+                path: "tokenProgram";
+              },
+              {
+                kind: "account";
+                path: "mint";
+              }
+            ];
+            program: {
+              kind: "const";
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ];
+            };
+          };
+        },
+        {
+          name: "associatedTokenProgram";
+          address: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        },
+        {
+          name: "tokenProgram";
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [
+        {
+          name: "startTime";
+          type: "i64";
+        },
+        {
+          name: "endTime";
+          type: "i64";
+        },
+        {
+          name: "secondsInADay";
+          type: "i64";
+        },
+        {
+          name: "dayNumber";
+          type: "u64";
+        },
+        {
+          name: "tokenSupplyPerDay";
+          type: "u64";
+        }
+      ];
+    },
+    {
       name: "buy";
       discriminator: [102, 6, 61, 18, 1, 218, 235, 234];
       accounts: [
@@ -141,6 +322,7 @@ export type PumpSwap = {
         },
         {
           name: "program";
+          address: "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA";
         },
         {
           name: "coinCreatorVaultAta";
@@ -214,6 +396,92 @@ export type PumpSwap = {
               }
             ];
           };
+        },
+        {
+          name: "globalVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              }
+            ];
+          };
+        },
+        {
+          name: "userVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [117, 115, 101, 114, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              },
+              {
+                kind: "account";
+                path: "user";
+              }
+            ];
+          };
+        },
+        {
+          name: "feeConfig";
+          optional: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [102, 101, 101, 95, 99, 111, 110, 102, 105, 103];
+              },
+              {
+                kind: "const";
+                value: [
+                  12,
+                  20,
+                  222,
+                  252,
+                  130,
+                  94,
+                  198,
+                  118,
+                  148,
+                  37,
+                  8,
+                  24,
+                  187,
+                  101,
+                  64,
+                  101,
+                  244,
+                  41,
+                  141,
+                  49,
+                  86,
+                  213,
+                  113,
+                  180,
+                  212,
+                  248,
+                  9,
+                  12,
+                  24,
+                  233,
+                  168,
+                  99
+                ];
+              }
+            ];
+            program: {
+              kind: "account";
+              path: "feeProgram";
+            };
+          };
+        },
+        {
+          name: "feeProgram";
+          optional: true;
+          address: "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ";
         }
       ];
       args: [
@@ -224,8 +492,244 @@ export type PumpSwap = {
         {
           name: "maxQuoteAmountIn";
           type: "u64";
+        },
+        {
+          name: "trackVolume";
+          type: {
+            defined: {
+              name: "optionBool";
+            };
+          };
         }
       ];
+    },
+    {
+      name: "claimTokenIncentives";
+      discriminator: [16, 4, 71, 28, 204, 1, 40, 27];
+      accounts: [
+        {
+          name: "user";
+        },
+        {
+          name: "userAta";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "account";
+                path: "user";
+              },
+              {
+                kind: "account";
+                path: "tokenProgram";
+              },
+              {
+                kind: "account";
+                path: "mint";
+              }
+            ];
+            program: {
+              kind: "const";
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ];
+            };
+          };
+        },
+        {
+          name: "globalVolumeAccumulator";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              }
+            ];
+          };
+        },
+        {
+          name: "globalIncentiveTokenAccount";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "account";
+                path: "globalVolumeAccumulator";
+              },
+              {
+                kind: "account";
+                path: "tokenProgram";
+              },
+              {
+                kind: "account";
+                path: "mint";
+              }
+            ];
+            program: {
+              kind: "const";
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ];
+            };
+          };
+        },
+        {
+          name: "userVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [117, 115, 101, 114, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              },
+              {
+                kind: "account";
+                path: "user";
+              }
+            ];
+          };
+        },
+        {
+          name: "mint";
+          relations: ["globalVolumeAccumulator"];
+        },
+        {
+          name: "tokenProgram";
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        },
+        {
+          name: "associatedTokenProgram";
+          address: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+          address: "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA";
+        },
+        {
+          name: "payer";
+          writable: true;
+          signer: true;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "closeUserVolumeAccumulator";
+      discriminator: [249, 69, 164, 218, 150, 103, 84, 138];
+      accounts: [
+        {
+          name: "user";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "userVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [117, 115, 101, 114, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              },
+              {
+                kind: "account";
+                path: "user";
+              }
+            ];
+          };
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [];
     },
     {
       name: "collectCoinCreatorFee";
@@ -239,7 +743,6 @@ export type PumpSwap = {
         },
         {
           name: "coinCreator";
-          signer: true;
         },
         {
           name: "coinCreatorVaultAuthority";
@@ -393,6 +896,10 @@ export type PumpSwap = {
         {
           name: "coinCreatorFeeBasisPoints";
           type: "u64";
+        },
+        {
+          name: "adminSetCoinCreatorAuthority";
+          type: "pubkey";
         }
       ];
     },
@@ -862,6 +1369,55 @@ export type PumpSwap = {
       args: [];
     },
     {
+      name: "initUserVolumeAccumulator";
+      discriminator: [94, 6, 202, 115, 255, 96, 232, 183];
+      accounts: [
+        {
+          name: "payer";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "user";
+        },
+        {
+          name: "userVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [117, 115, 101, 114, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              },
+              {
+                kind: "account";
+                path: "user";
+              }
+            ];
+          };
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [];
+    },
+    {
       name: "sell";
       discriminator: [51, 230, 133, 164, 1, 127, 131, 173];
       accounts: [
@@ -989,6 +1545,7 @@ export type PumpSwap = {
         },
         {
           name: "program";
+          address: "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA";
         },
         {
           name: "coinCreatorVaultAta";
@@ -1062,6 +1619,64 @@ export type PumpSwap = {
               }
             ];
           };
+        },
+        {
+          name: "feeConfig";
+          optional: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [102, 101, 101, 95, 99, 111, 110, 102, 105, 103];
+              },
+              {
+                kind: "const";
+                value: [
+                  12,
+                  20,
+                  222,
+                  252,
+                  130,
+                  94,
+                  198,
+                  118,
+                  148,
+                  37,
+                  8,
+                  24,
+                  187,
+                  101,
+                  64,
+                  101,
+                  244,
+                  41,
+                  141,
+                  49,
+                  86,
+                  213,
+                  113,
+                  180,
+                  212,
+                  248,
+                  9,
+                  12,
+                  24,
+                  233,
+                  168,
+                  99
+                ];
+              }
+            ];
+            program: {
+              kind: "account";
+              path: "feeProgram";
+            };
+          };
+        },
+        {
+          name: "feeProgram";
+          optional: true;
+          address: "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ";
         }
       ];
       args: [
@@ -1245,6 +1860,57 @@ export type PumpSwap = {
       args: [];
     },
     {
+      name: "syncUserVolumeAccumulator";
+      discriminator: [86, 31, 192, 87, 163, 87, 79, 238];
+      accounts: [
+        {
+          name: "user";
+        },
+        {
+          name: "globalVolumeAccumulator";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [103, 108, 111, 98, 97, 108, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              }
+            ];
+          };
+        },
+        {
+          name: "userVolumeAccumulator";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [117, 115, 101, 114, 95, 118, 111, 108, 117, 109, 101, 95, 97, 99, 99, 117, 109, 117, 108, 97, 116, 111, 114];
+              },
+              {
+                kind: "account";
+                path: "user";
+              }
+            ];
+          };
+        },
+        {
+          name: "eventAuthority";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121];
+              }
+            ];
+          };
+        },
+        {
+          name: "program";
+        }
+      ];
+      args: [];
+    },
+    {
       name: "updateAdmin";
       discriminator: [161, 176, 40, 213, 60, 184, 179, 228];
       accounts: [
@@ -1323,6 +1989,10 @@ export type PumpSwap = {
         {
           name: "coinCreatorFeeBasisPoints";
           type: "u64";
+        },
+        {
+          name: "adminSetCoinCreatorAuthority";
+          type: "pubkey";
         }
       ];
     },
@@ -1421,18 +2091,46 @@ export type PumpSwap = {
       discriminator: [23, 183, 248, 55, 96, 216, 172, 96];
     },
     {
+      name: "feeConfig";
+      discriminator: [143, 52, 146, 187, 219, 123, 76, 155];
+    },
+    {
       name: "globalConfig";
       discriminator: [149, 8, 156, 202, 160, 252, 176, 217];
     },
     {
+      name: "globalVolumeAccumulator";
+      discriminator: [202, 42, 246, 43, 142, 190, 30, 255];
+    },
+    {
       name: "pool";
       discriminator: [241, 154, 109, 4, 17, 177, 109, 188];
+    },
+    {
+      name: "userVolumeAccumulator";
+      discriminator: [86, 255, 112, 14, 102, 53, 154, 250];
     }
   ];
   events: [
     {
+      name: "adminSetCoinCreatorEvent";
+      discriminator: [45, 220, 93, 24, 25, 97, 172, 104];
+    },
+    {
+      name: "adminUpdateTokenIncentivesEvent";
+      discriminator: [147, 250, 108, 120, 247, 29, 67, 222];
+    },
+    {
       name: "buyEvent";
       discriminator: [103, 244, 82, 31, 44, 245, 119, 119];
+    },
+    {
+      name: "claimTokenIncentivesEvent";
+      discriminator: [79, 172, 246, 49, 205, 91, 206, 232];
+    },
+    {
+      name: "closeUserVolumeAccumulatorEvent";
+      discriminator: [146, 159, 189, 172, 146, 88, 56, 244];
     },
     {
       name: "collectCoinCreatorFeeEvent";
@@ -1459,6 +2157,10 @@ export type PumpSwap = {
       discriminator: [97, 97, 215, 144, 93, 146, 22, 124];
     },
     {
+      name: "initUserVolumeAccumulatorEvent";
+      discriminator: [134, 36, 13, 72, 232, 101, 130, 216];
+    },
+    {
       name: "sellEvent";
       discriminator: [62, 47, 55, 10, 165, 3, 220, 42];
     },
@@ -1469,6 +2171,10 @@ export type PumpSwap = {
     {
       name: "setMetaplexCoinCreatorEvent";
       discriminator: [150, 107, 199, 123, 124, 207, 102, 228];
+    },
+    {
+      name: "syncUserVolumeAccumulatorEvent";
+      discriminator: [197, 122, 167, 124, 116, 81, 91, 255];
     },
     {
       name: "updateAdminEvent";
@@ -1599,9 +2305,117 @@ export type PumpSwap = {
     {
       code: 6028;
       name: "onlyCanonicalPumpPoolsCanHaveCoinCreator";
+    },
+    {
+      code: 6029;
+      name: "invalidAdminSetCoinCreatorAuthority";
+    },
+    {
+      code: 6030;
+      name: "startTimeInThePast";
+    },
+    {
+      code: 6031;
+      name: "endTimeInThePast";
+    },
+    {
+      code: 6032;
+      name: "endTimeBeforeStartTime";
+    },
+    {
+      code: 6033;
+      name: "timeRangeTooLarge";
+    },
+    {
+      code: 6034;
+      name: "endTimeBeforeCurrentDay";
+    },
+    {
+      code: 6035;
+      name: "supplyUpdateForFinishedRange";
+    },
+    {
+      code: 6036;
+      name: "dayIndexAfterEndIndex";
+    },
+    {
+      code: 6037;
+      name: "dayInActiveRange";
+    },
+    {
+      code: 6038;
+      name: "invalidIncentiveMint";
     }
   ];
   types: [
+    {
+      name: "adminSetCoinCreatorEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "timestamp";
+            type: "i64";
+          },
+          {
+            name: "adminSetCoinCreatorAuthority";
+            type: "pubkey";
+          },
+          {
+            name: "baseMint";
+            type: "pubkey";
+          },
+          {
+            name: "pool";
+            type: "pubkey";
+          },
+          {
+            name: "oldCoinCreator";
+            type: "pubkey";
+          },
+          {
+            name: "newCoinCreator";
+            type: "pubkey";
+          }
+        ];
+      };
+    },
+    {
+      name: "adminUpdateTokenIncentivesEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "startTime";
+            type: "i64";
+          },
+          {
+            name: "endTime";
+            type: "i64";
+          },
+          {
+            name: "dayNumber";
+            type: "u64";
+          },
+          {
+            name: "tokenSupplyPerDay";
+            type: "u64";
+          },
+          {
+            name: "mint";
+            type: "pubkey";
+          },
+          {
+            name: "secondsInADay";
+            type: "i64";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
+          }
+        ];
+      };
+    },
     {
       name: "bondingCurve";
       type: {
@@ -1734,6 +2548,90 @@ export type PumpSwap = {
           {
             name: "coinCreatorFee";
             type: "u64";
+          },
+          {
+            name: "trackVolume";
+            type: "bool";
+          },
+          {
+            name: "totalUnclaimedTokens";
+            type: "u64";
+          },
+          {
+            name: "totalClaimedTokens";
+            type: "u64";
+          },
+          {
+            name: "currentSolVolume";
+            type: "u64";
+          },
+          {
+            name: "lastUpdateTimestamp";
+            type: "i64";
+          }
+        ];
+      };
+    },
+    {
+      name: "claimTokenIncentivesEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "user";
+            type: "pubkey";
+          },
+          {
+            name: "mint";
+            type: "pubkey";
+          },
+          {
+            name: "amount";
+            type: "u64";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
+          },
+          {
+            name: "totalClaimedTokens";
+            type: "u64";
+          },
+          {
+            name: "currentSolVolume";
+            type: "u64";
+          }
+        ];
+      };
+    },
+    {
+      name: "closeUserVolumeAccumulatorEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "user";
+            type: "pubkey";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
+          },
+          {
+            name: "totalUnclaimedTokens";
+            type: "u64";
+          },
+          {
+            name: "totalClaimedTokens";
+            type: "u64";
+          },
+          {
+            name: "currentSolVolume";
+            type: "u64";
+          },
+          {
+            name: "lastUpdateTimestamp";
+            type: "i64";
           }
         ];
       };
@@ -1796,6 +2694,10 @@ export type PumpSwap = {
           {
             name: "coinCreatorFeeBasisPoints";
             type: "u64";
+          },
+          {
+            name: "adminSetCoinCreatorAuthority";
+            type: "pubkey";
           }
         ];
       };
@@ -2025,6 +2927,80 @@ export type PumpSwap = {
       };
     },
     {
+      name: "feeConfig";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "bump";
+            type: "u8";
+          },
+          {
+            name: "admin";
+            type: "pubkey";
+          },
+          {
+            name: "flatFees";
+            type: {
+              defined: {
+                name: "fees";
+              };
+            };
+          },
+          {
+            name: "feeTiers";
+            type: {
+              vec: {
+                defined: {
+                  name: "feeTier";
+                };
+              };
+            };
+          }
+        ];
+      };
+    },
+    {
+      name: "feeTier";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "marketCapLamportsThreshold";
+            type: "u128";
+          },
+          {
+            name: "fees";
+            type: {
+              defined: {
+                name: "fees";
+              };
+            };
+          }
+        ];
+      };
+    },
+    {
+      name: "fees";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "lpFeeBps";
+            type: "u64";
+          },
+          {
+            name: "protocolFeeBps";
+            type: "u64";
+          },
+          {
+            name: "creatorFeeBps";
+            type: "u64";
+          }
+        ];
+      };
+    },
+    {
       name: "globalConfig";
       type: {
         kind: "struct";
@@ -2036,12 +3012,10 @@ export type PumpSwap = {
           },
           {
             name: "lpFeeBasisPoints";
-            docs: ["The lp fee in basis points (0.01%)"];
             type: "u64";
           },
           {
             name: "protocolFeeBasisPoints";
-            docs: ["The protocol fee in basis points (0.01%)"];
             type: "u64";
           },
           {
@@ -2065,10 +3039,77 @@ export type PumpSwap = {
           },
           {
             name: "coinCreatorFeeBasisPoints";
-            docs: ["The coin creator fee in basis points (0.01%)"];
             type: "u64";
+          },
+          {
+            name: "adminSetCoinCreatorAuthority";
+            docs: ["The admin authority for setting coin creators"];
+            type: "pubkey";
           }
         ];
+      };
+    },
+    {
+      name: "globalVolumeAccumulator";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "startTime";
+            type: "i64";
+          },
+          {
+            name: "endTime";
+            type: "i64";
+          },
+          {
+            name: "secondsInADay";
+            type: "i64";
+          },
+          {
+            name: "mint";
+            type: "pubkey";
+          },
+          {
+            name: "totalTokenSupply";
+            type: {
+              array: ["u64", 30];
+            };
+          },
+          {
+            name: "solVolumes";
+            type: {
+              array: ["u64", 30];
+            };
+          }
+        ];
+      };
+    },
+    {
+      name: "initUserVolumeAccumulatorEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "payer";
+            type: "pubkey";
+          },
+          {
+            name: "user";
+            type: "pubkey";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
+          }
+        ];
+      };
+    },
+    {
+      name: "optionBool";
+      type: {
+        kind: "struct";
+        fields: ["bool"];
       };
     },
     {
@@ -2277,6 +3318,30 @@ export type PumpSwap = {
       };
     },
     {
+      name: "syncUserVolumeAccumulatorEvent";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "user";
+            type: "pubkey";
+          },
+          {
+            name: "totalClaimedTokensBefore";
+            type: "u64";
+          },
+          {
+            name: "totalClaimedTokensAfter";
+            type: "u64";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
+          }
+        ];
+      };
+    },
+    {
       name: "updateAdminEvent";
       type: {
         kind: "struct";
@@ -2326,6 +3391,46 @@ export type PumpSwap = {
           {
             name: "coinCreatorFeeBasisPoints";
             type: "u64";
+          },
+          {
+            name: "adminSetCoinCreatorAuthority";
+            type: "pubkey";
+          }
+        ];
+      };
+    },
+    {
+      name: "userVolumeAccumulator";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "user";
+            type: "pubkey";
+          },
+          {
+            name: "needsClaim";
+            type: "bool";
+          },
+          {
+            name: "totalUnclaimedTokens";
+            type: "u64";
+          },
+          {
+            name: "totalClaimedTokens";
+            type: "u64";
+          },
+          {
+            name: "currentSolVolume";
+            type: "u64";
+          },
+          {
+            name: "lastUpdateTimestamp";
+            type: "i64";
+          },
+          {
+            name: "hasTotalClaimedTokens";
+            type: "bool";
           }
         ];
       };

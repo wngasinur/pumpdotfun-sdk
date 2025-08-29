@@ -138,7 +138,9 @@ export class PumpSwapSDK {
     );
     transaction.add(createSyncNativeInstruction(userQuoteTokenAccount));
     // sync wrapped SOL balance
-    transaction.add(await this.program.methods.buy(new BN(amount.toString()), new BN(solAmount.toString())).accountsPartial(swapAccounts).instruction());
+    transaction.add(
+      await this.program.methods.buy(new BN(amount.toString()), new BN(solAmount.toString()), { 0: true }).accountsPartial(swapAccounts).instruction()
+    );
 
     transaction.add(createCloseAccountInstruction(userQuoteTokenAccount, user, user));
 
