@@ -481,7 +481,6 @@ export type PumpFun = {
         },
         {
           name: "feeConfig";
-          optional: true;
           pda: {
             seeds: [
               {
@@ -534,7 +533,6 @@ export type PumpFun = {
         },
         {
           name: "feeProgram";
-          optional: true;
           address: "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ";
         }
       ];
@@ -1770,7 +1768,6 @@ export type PumpFun = {
         },
         {
           name: "feeConfig";
-          optional: true;
           pda: {
             seeds: [
               {
@@ -1823,7 +1820,6 @@ export type PumpFun = {
         },
         {
           name: "feeProgram";
-          optional: true;
           address: "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ";
         }
       ];

@@ -427,7 +427,6 @@ export type PumpSwap = {
         },
         {
           name: "feeConfig";
-          optional: true;
           pda: {
             seeds: [
               {
@@ -480,7 +479,6 @@ export type PumpSwap = {
         },
         {
           name: "feeProgram";
-          optional: true;
           address: "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ";
         }
       ];
@@ -1622,7 +1620,6 @@ export type PumpSwap = {
         },
         {
           name: "feeConfig";
-          optional: true;
           pda: {
             seeds: [
               {
@@ -1675,7 +1672,6 @@ export type PumpSwap = {
         },
         {
           name: "feeProgram";
-          optional: true;
           address: "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ";
         }
       ];
